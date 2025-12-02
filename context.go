@@ -62,7 +62,7 @@ func (c *defaultContext) setRoute(route *Route) {
 	c.route = route
 }
 
-func (c *defaultContext) Handlers() []Handler {
+func (c *defaultContext) handlers() []Handler {
 	if c.route == nil {
 		return []Handler{}
 	}
@@ -70,7 +70,7 @@ func (c *defaultContext) Handlers() []Handler {
 	return c.route.handlers
 }
 
-func (c *defaultContext) Parameters() map[string]string {
+func (c *defaultContext) parameters() map[string]string {
 	if c.route == nil {
 		return make(map[string]string)
 	}
@@ -79,7 +79,7 @@ func (c *defaultContext) Parameters() map[string]string {
 }
 
 func (c *defaultContext) Next() error {
-	handlers := c.Handlers()
+	handlers := c.handlers()
 
 	if len(handlers) == 0 {
 		return NewHTTPError(http.StatusNotFound, fmt.Sprintf("Route %s not found", c.Request().Path()))

@@ -25,10 +25,10 @@ type Context interface {
 	setRoute(route *Route)
 
 	// Returns the handlers extracted from the matched route
-	Handlers() []Handler
+	handlers() []Handler
 
 	// Returns the route parameters extracted from the matched route
-	Parameters() map[string]string
+	parameters() map[string]string
 
 	// Executes the next method in the handler stack that matches the current route
 	Next() error

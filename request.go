@@ -21,7 +21,7 @@ func (r *request) Path() string {
 }
 
 func (r *request) PathVariable(key string) string {
-	parameters := r.c.Parameters()
+	parameters := r.c.parameters()
 
 	value, exists := parameters[key]
 	if !exists {
