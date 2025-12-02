@@ -1,6 +1,7 @@
 package beatles
 
 import (
+	"maps"
 	"net/http"
 	"strings"
 
@@ -101,10 +102,7 @@ func (rt *routerTree) Search(method string, path string) (*route, error) {
 		return nil, NewHTTPError(http.StatusMethodNotAllowed, "Method not allowed")
 	}
 
-	// Copy parameters
-	for k, v := range parameters {
-		route.parameters[k] = v
-	}
+	maps.Copy(route.parameters, parameters)
 
 	return route, nil
 }
