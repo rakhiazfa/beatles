@@ -31,11 +31,6 @@ func TestApplication(t *testing.T) {
 	router := app.Router()
 
 	apiGroup := router.Group("/api")
-
-	apiGroup.Get("/swagger/**", func(c Context) error {
-		return nil
-	})
-
 	userGroup := apiGroup.Group("/users")
 
 	userGroup.Get("/", func(c Context) error {
