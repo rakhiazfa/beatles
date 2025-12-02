@@ -15,7 +15,7 @@ type defaultContext struct {
 	request  Request
 	response Response
 
-	route        *Route
+	route        *route
 	handlerIndex int
 }
 
@@ -58,7 +58,7 @@ func (c *defaultContext) Response() Response {
 	return c.response
 }
 
-func (c *defaultContext) setRoute(route *Route) {
+func (c *defaultContext) setRoute(route *route) {
 	c.route = route
 }
 

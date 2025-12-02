@@ -22,6 +22,8 @@ var mockUsers = []JSON{
 }
 
 func TestApplication(t *testing.T) {
+	t.Parallel()
+
 	app := New(ApplicationConfig{
 		Name: "Beatles",
 	})
@@ -29,6 +31,11 @@ func TestApplication(t *testing.T) {
 	router := app.Router()
 
 	apiGroup := router.Group("/api")
+
+	apiGroup.Get("/swagger/**", func(c Context) error {
+		return nil
+	})
+
 	userGroup := apiGroup.Group("/users")
 
 	userGroup.Get("/", func(c Context) error {
@@ -36,7 +43,6 @@ func TestApplication(t *testing.T) {
 			"data": mockUsers,
 		})
 	})
-
 	userGroup.Get("/:id", func(c Context) error {
 		id := c.Request().PathVariable("id")
 

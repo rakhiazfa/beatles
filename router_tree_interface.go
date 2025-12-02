@@ -7,5 +7,5 @@ type RouterTree interface {
 	Register(method string, path string, handlers ...Handler)
 
 	// Search looks up a route based on the HTTP method and path
-	Search(method string, path string) *Route
+	Search(method string, path string) (*route, error)
 }

@@ -86,11 +86,16 @@ func (app *application) handler() fasthttp.RequestHandler {
 		c := app.AcquireContext(requestCtx)
 		defer app.ReleaseContext(c)
 
-		route := app.router.Search(c.Request().Method(), c.Request().Path())
+		route, err := app.router.Search(c.Request().Method(), c.Request().Path())
+		if err != nil {
+			// TODO: handle error
+			return
+		}
+
 		c.setRoute(route)
 
 		if err := c.Next(); err != nil {
-			// TODO: handler error
+			// TODO: handle error
 			return
 		}
 	}

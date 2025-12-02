@@ -1,6 +1,6 @@
 package beatles
 
-type Route struct {
+type route struct {
 	handlers   []Handler
 	parameters map[string]string
 }

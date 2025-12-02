@@ -8,125 +8,103 @@ import (
 )
 
 type routerTree struct {
-	trees    map[string]*routerNode
+	root     *routerNode
 	handlers []Handler
 }
 
 func NewRouterTree() RouterTree {
 	return &routerTree{
-		trees:    make(map[string]*routerNode),
-		handlers: []Handler{},
+		root: newRouterNode("/", SegmentStatic, ""),
 	}
 }
 
 func (rt *routerTree) Register(method string, path string, handlers ...Handler) {
+	method = strings.ToUpper(method)
+
+	current := rt.root
 	segments := pathutils.Split(path)
-
-	root, ok := rt.trees[method]
-	if !ok {
-		root = &routerNode{}
-		rt.trees[method] = root
-	}
-
-	currentNode := root
 
 	for _, segment := range segments {
-		var child *routerNode
-		var isParameter bool
-		var isWildcard bool
-		var parameterName string
+		segmentType, parameterName := classifySegment(segment)
 
-		if strings.HasPrefix(segment, ":") {
-			isParameter = true
-			parameterName = segment[1:]
-		} else if strings.HasPrefix(segment, "*") {
-			isWildcard = true
-			parameterName = segment[1:]
-		}
-
-		for _, node := range currentNode.children {
-			if node.segment == segment || (isParameter && node.parameterName != "") || (isWildcard && node.isWildcard) {
-				child = node
-				break
-			}
-		}
+		child := current.findChildNodeBySegmentAndSegmentType(segment, segmentType)
 
 		if child == nil {
-			child = &routerNode{
-				segment:       segment,
-				parameterName: parameterName,
-				isWildcard:    isWildcard,
-			}
-			currentNode.children = append(currentNode.children, child)
+			child = newRouterNode(segment, segmentType, parameterName)
+			current.children = append(current.children, child)
 		}
 
-		currentNode = child
-
-		if isWildcard {
-			break
-		}
+		current = child
 	}
 
-	currentNode.handlers = handlers
+	current.routes[method] = &route{
+		handlers:   handlers,
+		parameters: make(map[string]string),
+	}
 }
 
-func (rt *routerTree) Search(method string, path string) *Route {
-	root := rt.trees[method]
-	if root == nil {
-		return nil
-	}
+func (rt *routerTree) Search(method string, path string) (*route, error) {
+	method = strings.ToUpper(method)
 
+	current := rt.root
 	segments := pathutils.Split(path)
+
 	parameters := make(map[string]string)
 
-	currentNode := root
+	for _, segment := range segments {
+		var match *routerNode
 
-	for index := range len(segments) {
-		segment := segments[index]
+		// Try to get router node with segment type 'static'
+		for _, child := range current.children {
+			if child.segmentType == SegmentStatic && child.segment == segment {
+				match = child
 
-		var next *routerNode
-
-		for _, node := range currentNode.children {
-			if node.segment == segment && node.parameterName == "" && !node.isWildcard {
-				next = node
 				break
 			}
 		}
 
-		if next == nil {
-			for _, node := range currentNode.children {
-				if node.parameterName != "" && !node.isWildcard {
-					next = node
-					parameters[node.parameterName] = segment
+		// Try to get router node with segment type 'parameter'
+		if match == nil {
+			for _, child := range current.children {
+				if child.segmentType == SegmentParam {
+					match = child
+					parameters[child.parameterName] = segment
+
 					break
 				}
 			}
 		}
 
-		if next == nil {
-			for _, node := range currentNode.children {
-				if node.isWildcard {
-					next = node
-					parameters[node.parameterName] = strings.Join(segments[index:], "/")
-					return &Route{
-						handlers:   next.handlers,
-						parameters: parameters,
-					}
+		// Try to get router node with segment type 'wildcard'
+		if match == nil {
+			for _, child := range current.children {
+				if child.segmentType == SegmentWildcard {
+					match = child
+					parameters[child.parameterName] = segment
+
+					break
 				}
 			}
 		}
 
-		if next == nil {
-			return nil
+		if match == nil {
+			return nil, NewHTTPError(http.StatusNotFound, "Route not found")
 		}
 
-		currentNode = next
+		current = match
 	}
 
-	return &Route{
-		handlers:   currentNode.handlers,
-		parameters: parameters,
+	route, ok := current.routes[method]
+	if !ok {
+		return nil, NewHTTPError(http.StatusMethodNotAllowed, "Method not allowed")
 	}
+
+	// Copy parameters
+	for k, v := range parameters {
+		route.parameters[k] = v
+	}
+
+	return route, nil
 }
 
 func (rt *routerTree) Use(handlers ...Handler) Router {

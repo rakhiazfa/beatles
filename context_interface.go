@@ -22,7 +22,7 @@ type Context interface {
 	Response() Response
 
 	// Stores the given route into the context
-	setRoute(route *Route)
+	setRoute(route *route)
 
 	// Returns the handlers extracted from the matched route
 	handlers() []Handler

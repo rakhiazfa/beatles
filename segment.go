@@ -50,14 +50,20 @@ func (segmentType SegmentType) String() string {
 	return ""
 }
 
-func detectSegmentType(segment string) SegmentType {
+func classifySegment(segment string) (SegmentType, string) {
 	if strings.HasPrefix(segment, ":") {
-		return SegmentParam
+		return SegmentParam, segment[1:]
 	}
 
 	if strings.HasPrefix(segment, "*") {
-		return SegmentWildcard
+		name := ""
+
+		if len(segment) > 1 {
+			name = segment[1:]
+		}
+
+		return SegmentWildcard, name
 	}
 
-	return SegmentStatic
+	return SegmentStatic, ""
 }

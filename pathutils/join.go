@@ -7,14 +7,12 @@ import (
 
 var slashCollapse = regexp.MustCompile(`/+`)
 
+// Normalizes and concatenates two URL path segments (prefix and path).
 func Join(prefix, path string) string {
-	clearedPrefix := slashCollapse.ReplaceAllString(prefix, "/")
-	clearedPrefix = strings.Trim(clearedPrefix, "/")
+	prefix = strings.TrimSuffix(prefix, "/")
+	path = strings.TrimPrefix(path, "/")
 
-	clearedPath := slashCollapse.ReplaceAllString(path, "/")
-	clearedPath = strings.Trim(clearedPath, "/")
+	joined := prefix + "/" + path
 
-	joined := "/" + clearedPrefix + "/" + clearedPath
-
-	return slashCollapse.ReplaceAllString(joined, "/")
+	return joined
 }
