@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/rakhiazfa/beatles/pkg/colorutils"
-	"github.com/rakhiazfa/beatles/pkg/stringutils"
+	"github.com/rakhiazfa/beatles/colorutils"
+	"github.com/rakhiazfa/beatles/stringutils"
 )
 
 type logger struct {

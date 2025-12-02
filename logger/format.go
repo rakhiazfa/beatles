@@ -8,7 +8,7 @@ import (
 type Format uint32
 
 const (
-	FormatText = iota
+	FormatText Format = iota
 	FormatJSON
 )
 
