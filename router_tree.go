@@ -18,11 +18,13 @@ func NewRouterTree() RouterTree {
 	}
 }
 
-func (rt *routerTree) Register(method string, path string, handlers ...Handler) {
+func (rt *routerTree) Register(method string, path string, handler Handler, handlers ...Handler) {
 	method = strings.ToUpper(method)
 
 	current := rt.root
 	segments := pathutils.Split(path)
+
+	allHandlers := append([]Handler{handler}, handlers...)
 
 	for _, segment := range segments {
 		segmentType, parameterName := classifySegment(segment)
@@ -38,7 +40,7 @@ func (rt *routerTree) Register(method string, path string, handlers ...Handler) 
 	}
 
 	current.routes[method] = &route{
-		handlers:   handlers,
+		handlers:   allHandlers,
 		parameters: make(map[string]string),
 	}
 }
@@ -107,8 +109,10 @@ func (rt *routerTree) Search(method string, path string) (*route, error) {
 	return route, nil
 }
 
-func (rt *routerTree) Use(handlers ...Handler) Router {
+func (rt *routerTree) Use(handler Handler, handlers ...Handler) Router {
+	rt.handlers = append(rt.handlers, handler)
 	rt.handlers = append(rt.handlers, handlers...)
+
 	return rt
 }
 
@@ -120,54 +124,54 @@ func (rt *routerTree) Group(path string, handlers ...Handler) Router {
 	}
 }
 
-func (rt *routerTree) Get(path string, handlers ...Handler) Router {
-	rt.Register(http.MethodGet, path, handlers...)
+func (rt *routerTree) Get(path string, handler Handler, handlers ...Handler) Router {
+	rt.Register(http.MethodGet, path, handler, handlers...)
 	return rt
 }
 
-func (rt *routerTree) Head(path string, handlers ...Handler) Router {
-	rt.Register(http.MethodHead, path, handlers...)
+func (rt *routerTree) Head(path string, handler Handler, handlers ...Handler) Router {
+	rt.Register(http.MethodHead, path, handler, handlers...)
 	return rt
 }
 
-func (rt *routerTree) Post(path string, handlers ...Handler) Router {
-	rt.Register(http.MethodPost, path, handlers...)
+func (rt *routerTree) Post(path string, handler Handler, handlers ...Handler) Router {
+	rt.Register(http.MethodPost, path, handler, handlers...)
 	return rt
 }
 
-func (rt *routerTree) Put(path string, handlers ...Handler) Router {
-	rt.Register(http.MethodPut, path, handlers...)
+func (rt *routerTree) Put(path string, handler Handler, handlers ...Handler) Router {
+	rt.Register(http.MethodPut, path, handler, handlers...)
 	return rt
 }
 
-func (rt *routerTree) Delete(path string, handlers ...Handler) Router {
-	rt.Register(http.MethodDelete, path, handlers...)
+func (rt *routerTree) Delete(path string, handler Handler, handlers ...Handler) Router {
+	rt.Register(http.MethodDelete, path, handler, handlers...)
 	return rt
 }
 
-func (rt *routerTree) Connect(path string, handlers ...Handler) Router {
-	rt.Register(http.MethodConnect, path, handlers...)
+func (rt *routerTree) Connect(path string, handler Handler, handlers ...Handler) Router {
+	rt.Register(http.MethodConnect, path, handler, handlers...)
 	return rt
 }
 
-func (rt *routerTree) Options(path string, handlers ...Handler) Router {
-	rt.Register(http.MethodOptions, path, handlers...)
+func (rt *routerTree) Options(path string, handler Handler, handlers ...Handler) Router {
+	rt.Register(http.MethodOptions, path, handler, handlers...)
 	return rt
 }
 
-func (rt *routerTree) Trace(path string, handlers ...Handler) Router {
-	rt.Register(http.MethodTrace, path, handlers...)
+func (rt *routerTree) Trace(path string, handler Handler, handlers ...Handler) Router {
+	rt.Register(http.MethodTrace, path, handler, handlers...)
 	return rt
 }
 
-func (rt *routerTree) Patch(path string, handlers ...Handler) Router {
-	rt.Register(http.MethodPatch, path, handlers...)
+func (rt *routerTree) Patch(path string, handler Handler, handlers ...Handler) Router {
+	rt.Register(http.MethodPatch, path, handler, handlers...)
 	return rt
 }
 
-func (rt *routerTree) All(path string, handlers ...Handler) Router {
+func (rt *routerTree) All(path string, handler Handler, handlers ...Handler) Router {
 	for _, method := range allMethods {
-		rt.Register(method, path, handlers...)
+		rt.Register(method, path, handler, handlers...)
 	}
 
 	return rt

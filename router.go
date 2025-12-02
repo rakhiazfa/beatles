@@ -24,8 +24,10 @@ type router struct {
 	handlers   []Handler
 }
 
-func (r *router) Use(handlers ...Handler) Router {
+func (r *router) Use(handler Handler, handlers ...Handler) Router {
+	r.handlers = append(r.handlers, handler)
 	r.handlers = append(r.handlers, handlers...)
+
 	return r
 }
 
@@ -37,59 +39,59 @@ func (r *router) Group(path string, handlers ...Handler) Router {
 	}
 }
 
-func (r *router) Get(path string, handlers ...Handler) Router {
-	r.register(http.MethodGet, path, handlers...)
+func (r *router) Get(path string, handler Handler, handlers ...Handler) Router {
+	r.register(http.MethodGet, path, handler, handlers...)
 	return r
 }
 
-func (r *router) Head(path string, handlers ...Handler) Router {
-	r.register(http.MethodHead, path, handlers...)
+func (r *router) Head(path string, handler Handler, handlers ...Handler) Router {
+	r.register(http.MethodHead, path, handler, handlers...)
 	return r
 }
 
-func (r *router) Post(path string, handlers ...Handler) Router {
-	r.register(http.MethodPost, path, handlers...)
+func (r *router) Post(path string, handler Handler, handlers ...Handler) Router {
+	r.register(http.MethodPost, path, handler, handlers...)
 	return r
 }
 
-func (r *router) Put(path string, handlers ...Handler) Router {
-	r.register(http.MethodPut, path, handlers...)
+func (r *router) Put(path string, handler Handler, handlers ...Handler) Router {
+	r.register(http.MethodPut, path, handler, handlers...)
 	return r
 }
 
-func (r *router) Delete(path string, handlers ...Handler) Router {
-	r.register(http.MethodDelete, path, handlers...)
+func (r *router) Delete(path string, handler Handler, handlers ...Handler) Router {
+	r.register(http.MethodDelete, path, handler, handlers...)
 	return r
 }
 
-func (r *router) Connect(path string, handlers ...Handler) Router {
-	r.register(http.MethodConnect, path, handlers...)
+func (r *router) Connect(path string, handler Handler, handlers ...Handler) Router {
+	r.register(http.MethodConnect, path, handler, handlers...)
 	return r
 }
 
-func (r *router) Options(path string, handlers ...Handler) Router {
-	r.register(http.MethodOptions, path, handlers...)
+func (r *router) Options(path string, handler Handler, handlers ...Handler) Router {
+	r.register(http.MethodOptions, path, handler, handlers...)
 	return r
 }
 
-func (r *router) Trace(path string, handlers ...Handler) Router {
-	r.register(http.MethodTrace, path, handlers...)
+func (r *router) Trace(path string, handler Handler, handlers ...Handler) Router {
+	r.register(http.MethodTrace, path, handler, handlers...)
 	return r
 }
 
-func (r *router) Patch(path string, handlers ...Handler) Router {
-	r.register(http.MethodPatch, path, handlers...)
+func (r *router) Patch(path string, handler Handler, handlers ...Handler) Router {
+	r.register(http.MethodPatch, path, handler, handlers...)
 	return r
 }
 
-func (r *router) All(path string, handlers ...Handler) Router {
+func (r *router) All(path string, handler Handler, handlers ...Handler) Router {
 	for _, method := range allMethods {
-		r.register(method, path, handlers...)
+		r.register(method, path, handler, handlers...)
 	}
 
 	return r
 }
 
-func (r *router) register(method string, path string, handlers ...Handler) {
-	r.routerTree.Register(method, pathutils.Join(r.prefix, path), mergeHandlers(r.handlers, handlers)...)
+func (r *router) register(method string, path string, handler Handler, handlers ...Handler) {
+	r.routerTree.Register(method, pathutils.Join(r.prefix, path), handler, mergeHandlers(r.handlers, handlers)...)
 }
