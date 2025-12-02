@@ -25,7 +25,7 @@ func (r *response) SetBody(body []byte) error {
 	return nil
 }
 
-func (r *response) JSON(v any) error {
+func (r *response) JSON(v JSON) error {
 	b, err := json.Marshal(v)
 	if err != nil {
 		return err

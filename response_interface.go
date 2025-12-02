@@ -7,5 +7,5 @@ type Response interface {
 
 	SetBody(body []byte) error
 
-	JSON(v any) error
+	JSON(v JSON) error
 }
