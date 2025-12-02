@@ -101,8 +101,8 @@ func (app *application) handler() fasthttp.RequestHandler {
 	}
 }
 
-func (app *application) Listen(addr string, config ...ListenConfig) error {
-	mergedConfig := mergeListenConfig(DefaultListenConfig, config...)
+func (app *application) Start(addr string, config ...StartConfig) error {
+	mergedConfig := mergeStartConfig(DefaultStartConfig, config...)
 
 	listener, err := net.Listen(mergedConfig.Network, addr)
 	if err != nil {
@@ -116,4 +116,8 @@ func (app *application) Listen(addr string, config ...ListenConfig) error {
 	}
 
 	return app.server.Serve(listener)
+}
+
+func (app *application) Stop() error {
+	return nil
 }

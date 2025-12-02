@@ -59,5 +59,5 @@ func TestApplication(t *testing.T) {
 		})
 	})
 
-	assert.NoError(t, app.Listen(":8080"))
+	assert.NoError(t, app.Start(":8080"))
 }

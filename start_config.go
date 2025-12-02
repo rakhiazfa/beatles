@@ -1,6 +1,6 @@
 package beatles
 
-type ListenConfig struct {
+type StartConfig struct {
 	// Default: NetworkTCP4
 	Network string `json:"network"`
 
@@ -11,13 +11,13 @@ type ListenConfig struct {
 	KeyFile string `json:"key_file"`
 }
 
-var DefaultListenConfig = ListenConfig{
+var DefaultStartConfig = StartConfig{
 	Network:  NetworkTCP4,
 	CertFile: "",
 	KeyFile:  "",
 }
 
-func mergeListenConfig(def ListenConfig, config ...ListenConfig) ListenConfig {
+func mergeStartConfig(def StartConfig, config ...StartConfig) StartConfig {
 	if len(config) == 0 {
 		return def
 	}

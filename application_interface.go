@@ -25,5 +25,5 @@ type Application interface {
 	handler() fasthttp.RequestHandler
 
 	// Starts the HTTP server on given address using the provided optional ListenConfig
-	Listen(addr string, config ...ListenConfig) error
+	Start(addr string, config ...StartConfig) error
 }
