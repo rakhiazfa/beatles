@@ -110,10 +110,12 @@ func (l *logger) Error(args ...any) {
 
 func (l *logger) Fatal(args ...any) {
 	l.Log(LevelFatal, args...)
+	os.Exit(1)
 }
 
 func (l *logger) Panic(args ...any) {
 	l.Log(LevelPanic, args...)
+	panic(fmt.Sprint(args...))
 }
 
 func (l *logger) Debugf(format string, args ...any) {
@@ -134,10 +136,12 @@ func (l *logger) Errorf(format string, args ...any) {
 
 func (l *logger) Fatalf(format string, args ...any) {
 	l.Logf(LevelFatal, format, args...)
+	os.Exit(1)
 }
 
 func (l *logger) Panicf(format string, args ...any) {
 	l.Logf(LevelPanic, format, args...)
+	panic(fmt.Sprintf(format, args...))
 }
 
 func (l *logger) cloneWithFields(fields map[string]any) Logger {
