@@ -1,7 +1,6 @@
 package beatles
 
 import (
-	"maps"
 	"net/http"
 	"strings"
 
@@ -40,10 +39,7 @@ func (rt *routerTree) Register(method string, path string, handler Handler, hand
 		current = child
 	}
 
-	current.routes[method] = &route{
-		handlers:   allHandlers,
-		parameters: make(map[string]string),
-	}
+	current.routes[method] = allHandlers
 }
 
 func (rt *routerTree) Search(method string, path string) (*route, error) {
@@ -97,14 +93,15 @@ func (rt *routerTree) Search(method string, path string) (*route, error) {
 		current = match
 	}
 
-	route, ok := current.routes[method]
+	handlers, ok := current.routes[method]
 	if !ok {
 		return nil, NewHTTPError(http.StatusMethodNotAllowed, "Method not allowed")
 	}
 
-	maps.Copy(route.parameters, parameters)
-
-	return route, nil
+	return &route{
+		handlers:   handlers,
+		parameters: parameters,
+	}, nil
 }
 
 func (rt *routerTree) Use(handler Handler, handlers ...Handler) Router {

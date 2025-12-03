@@ -5,7 +5,7 @@ type routerNode struct {
 	segmentType   SegmentType
 	children      []*routerNode
 	parameterName string
-	routes        map[string]*route
+	routes        map[string][]Handler
 }
 
 func newRouterNode(
@@ -18,7 +18,7 @@ func newRouterNode(
 		segmentType:   segmentType,
 		children:      []*routerNode{},
 		parameterName: parameterName,
-		routes:        make(map[string]*route),
+		routes:        make(map[string][]Handler),
 	}
 }
 
