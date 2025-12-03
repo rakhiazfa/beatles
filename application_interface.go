@@ -15,6 +15,9 @@ type Application interface {
 	// Returns the router tree instance
 	Router() RouterTree
 
+	// Stores the given error handler into the application
+	SetErrorHandler(errorHandler ErrorHandler) Application
+
 	// Retrieves a Context instance from the sync.Pool
 	AcquireContext(requestCtx *fasthttp.RequestCtx) Context
 

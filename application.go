@@ -18,13 +18,16 @@ type application struct {
 	server *fasthttp.Server
 
 	router RouterTree
+
+	errorHandler ErrorHandler
 }
 
 func New(config ...ApplicationConfig) Application {
 	app := &application{
-		logger: logger.New(),
-		config: mergeApplicationConfig(DefaultApplicationConfig, config...),
-		router: NewRouterTree(),
+		logger:       logger.New(),
+		config:       mergeApplicationConfig(DefaultApplicationConfig, config...),
+		router:       NewRouterTree(),
+		errorHandler: DefaultErrorHandler,
 	}
 
 	app.pool = sync.Pool{
@@ -64,6 +67,11 @@ func (app *application) Router() RouterTree {
 	return app.router
 }
 
+func (app *application) SetErrorHandler(errorHandler ErrorHandler) Application {
+	app.errorHandler = errorHandler
+	return app
+}
+
 func (app *application) AcquireContext(requestCtx *fasthttp.RequestCtx) Context {
 	c, ok := app.pool.Get().(Context)
 	if !ok {
@@ -88,14 +96,14 @@ func (app *application) handler() fasthttp.RequestHandler {
 
 		route, err := app.router.Search(c.Request().Method(), c.Request().Path())
 		if err != nil {
-			// TODO: handle error
+			app.errorHandler(c, err)
 			return
 		}
 
 		c.setRoute(route)
 
 		if err := c.Next(); err != nil {
-			// TODO: handle error
+			app.errorHandler(c, err)
 			return
 		}
 	}
